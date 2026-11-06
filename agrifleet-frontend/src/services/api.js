@@ -6,7 +6,7 @@ import axios from 'axios';
 // ==========================================
 const SERVICES = {
   CORE:       process.env.NEXT_PUBLIC_CORE_URL       || 'https://agrifleet-0kd0.onrender.com/api/v1',
-  ROUTING:    process.env.NEXT_PUBLIC_ROUTING_URL    || 'http://localhost:8081/api/v1',
+  ROUTING:    process.env.NEXT_PUBLIC_ROUTING_URL    || 'https://agrifleet-task-01.onrender.com',
   ALLOCATION: process.env.NEXT_PUBLIC_ALLOCATION_URL || 'http://localhost:8082/api/v1',
   NETWORK:    process.env.NEXT_PUBLIC_NETWORK_URL    || 'http://localhost:8083/api/v1',
   DECISION:   process.env.NEXT_PUBLIC_DECISION_URL   || 'http://localhost:8084/api/v1',
