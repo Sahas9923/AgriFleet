@@ -5,7 +5,7 @@ import axios from 'axios';
 // MICROSERVICE PORT CONFIGURATION
 // ==========================================
 const SERVICES = {
-  CORE:       process.env.NEXT_PUBLIC_CORE_URL       || 'http://localhost:8080/api/v1',
+  CORE:       process.env.NEXT_PUBLIC_CORE_URL       || 'https://agrifleet-0kd0.onrender.com/api/v1',
   ROUTING:    process.env.NEXT_PUBLIC_ROUTING_URL    || 'http://localhost:8081/api/v1',
   ALLOCATION: process.env.NEXT_PUBLIC_ALLOCATION_URL || 'http://localhost:8082/api/v1',
   NETWORK:    process.env.NEXT_PUBLIC_NETWORK_URL    || 'http://localhost:8083/api/v1',
