@@ -10,7 +10,7 @@ const SERVICES = {
   ALLOCATION: process.env.NEXT_PUBLIC_ALLOCATION_URL || 'https://agrifleet-task-02.onrender.com/api/v1',
   NETWORK:    process.env.NEXT_PUBLIC_NETWORK_URL    || 'https://agrifleet-task-03.onrender.com/api/v1',
   DECISION:   process.env.NEXT_PUBLIC_DECISION_URL   || 'https://agrifleet-task-04.onrender.com/api/v1',
-  TOUR:       process.env.NEXT_PUBLIC_TOUR_URL       || 'http://localhost:8085/api/v1',
+  TOUR:       process.env.NEXT_PUBLIC_TOUR_URL       || 'https://agrifleet-task-05.onrender.com/api/v1',
 };
 
 const createClient = (baseURL) => axios.create({
