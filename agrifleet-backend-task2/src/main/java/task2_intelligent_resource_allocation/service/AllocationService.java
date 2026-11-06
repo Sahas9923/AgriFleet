@@ -9,6 +9,7 @@ import task2_intelligent_resource_allocation.repository.AllocationBatchRepositor
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +22,11 @@ public class AllocationService {
     private final AllocatedAssignmentRepository assignmentRepository;
     private final RestTemplate restTemplate;
 
-    private final String CORE_SERVICE_URL = "http://localhost:8080/api/v1";
+    // Core service base URL.
+    // Render: set via core.service.url in application.properties (or CORE_SERVICE_URL env var)
+    // Fallback: local development on port 8080
+    @Value("${core.service.url:http://localhost:8080/api/v1}")
+    private String CORE_SERVICE_URL;
 
     public AllocationService(AllocationBatchRepository batchRepository,
                              AllocatedAssignmentRepository assignmentRepository) {
