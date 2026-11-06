@@ -3,6 +3,7 @@ package com.example.agrifleettask5.service;
 import com.example.agrifleettask5.model.FarmOpportunity;
 import com.example.agrifleettask5.model.FarmSelectionRequest;
 import com.example.agrifleettask5.model.FarmSelectionResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -13,7 +14,10 @@ import java.util.Objects;
 
 @Service
 public class FarmSelectionService {
-        private static final String CORE_SERVICE_URL = "http://localhost:8080/api/v1";
+        // Core service base URL (set core.service.url in application.properties or CORE_SERVICE_URL env var)
+        @Value("${core.service.url:http://localhost:8080/api/v1}")
+        private String CORE_SERVICE_URL;
+
         private final RestTemplate restTemplate = new RestTemplate();
 
         public List<FarmOpportunity> getAvailableFarmsFromCore() {
@@ -23,12 +27,12 @@ public class FarmSelectionService {
                 }
 
                 return Arrays.stream(bookings)
-                                .filter(Objects::nonNull)
-                                .filter(booking -> booking.bookingId != null && booking.farmLat != null
-                                                && booking.farmLng != null)
-                                .map(this::mapToFarmOpportunity)
-                                .filter(Objects::nonNull)
-                                .toList();
+                        .filter(Objects::nonNull)
+                        .filter(booking -> booking.bookingId != null && booking.farmLat != null
+                                && booking.farmLng != null)
+                        .map(this::mapToFarmOpportunity)
+                        .filter(Objects::nonNull)
+                        .toList();
         }
 
         public FarmSelectionResponse select(FarmSelectionRequest request) {
@@ -37,12 +41,12 @@ public class FarmSelectionService {
                 }
                 if (request.availableFarms() == null || request.availableFarms().isEmpty()) {
                         return new FarmSelectionResponse(List.of(), 0.0, 0.0, 0.0,
-                                        "AG19_WEIGHTED_SCORE", "maximize acreage and booking value");
+                                "AG19_WEIGHTED_SCORE", "maximize acreage and booking value");
                 }
 
                 int maxFarms = request.maxFarms() == null || request.maxFarms() <= 0
-                                ? request.availableFarms().size()
-                                : Math.min(request.maxFarms(), request.availableFarms().size());
+                        ? request.availableFarms().size()
+                        : Math.min(request.maxFarms(), request.availableFarms().size());
                 double acreageWeight = request.acreageWeight() == null ? 0.5 : request.acreageWeight();
                 double bookingValueWeight = request.bookingValueWeight() == null ? 0.5 : request.bookingValueWeight();
 
@@ -55,46 +59,46 @@ public class FarmSelectionService {
                 }
 
                 double maxAcreage = request.availableFarms().stream()
-                                .mapToDouble(FarmOpportunity::acreageHa)
-                                .max()
-                                .orElse(0.0);
+                        .mapToDouble(FarmOpportunity::acreageHa)
+                        .max()
+                        .orElse(0.0);
                 double maxBookingValue = request.availableFarms().stream()
-                                .mapToDouble(FarmOpportunity::bookingValue)
-                                .max()
-                                .orElse(0.0);
+                        .mapToDouble(FarmOpportunity::bookingValue)
+                        .max()
+                        .orElse(0.0);
 
                 List<FarmOpportunity> ranked = request.availableFarms().stream()
-                                .sorted(Comparator
-                                                .comparingDouble((FarmOpportunity farm) -> score(farm, acreageWeight,
-                                                                bookingValueWeight,
-                                                                maxAcreage, maxBookingValue))
-                                                .reversed()
-                                                .thenComparingDouble(FarmOpportunity::acreageHa).reversed()
-                                                .thenComparingDouble(FarmOpportunity::bookingValue).reversed()
-                                                .thenComparing(FarmOpportunity::name))
-                                .limit(maxFarms)
-                                .toList();
+                        .sorted(Comparator
+                                .comparingDouble((FarmOpportunity farm) -> score(farm, acreageWeight,
+                                        bookingValueWeight,
+                                        maxAcreage, maxBookingValue))
+                                .reversed()
+                                .thenComparingDouble(FarmOpportunity::acreageHa).reversed()
+                                .thenComparingDouble(FarmOpportunity::bookingValue).reversed()
+                                .thenComparing(FarmOpportunity::name))
+                        .limit(maxFarms)
+                        .toList();
 
                 double totalAcreage = ranked.stream().mapToDouble(FarmOpportunity::acreageHa).sum();
                 double totalBookingValue = ranked.stream().mapToDouble(FarmOpportunity::bookingValue).sum();
                 double objectiveScore = ranked.stream()
-                                .mapToDouble(farm -> score(farm, acreageWeight, bookingValueWeight, maxAcreage,
-                                                maxBookingValue))
-                                .average()
-                                .orElse(0.0);
+                        .mapToDouble(farm -> score(farm, acreageWeight, bookingValueWeight, maxAcreage,
+                                maxBookingValue))
+                        .average()
+                        .orElse(0.0);
 
                 return new FarmSelectionResponse(ranked, totalAcreage, totalBookingValue,
-                                objectiveScore, "AG19_WEIGHTED_SCORE",
-                                "maximize acreage and booking value");
+                        objectiveScore, "AG19_WEIGHTED_SCORE",
+                        "maximize acreage and booking value");
         }
 
         private double score(FarmOpportunity farm, double acreageWeight, double bookingValueWeight,
-                        double maxAcreage, double maxBookingValue) {
+                             double maxAcreage, double maxBookingValue) {
                 double normalizedAcreage = maxAcreage == 0 ? 0.0 : farm.acreageHa() / maxAcreage;
                 double normalizedBookingValue = maxBookingValue == 0 ? 0.0 : farm.bookingValue() / maxBookingValue;
                 return ((acreageWeight / (acreageWeight + bookingValueWeight)) * normalizedAcreage)
-                                + ((bookingValueWeight / (acreageWeight + bookingValueWeight))
-                                                * normalizedBookingValue);
+                        + ((bookingValueWeight / (acreageWeight + bookingValueWeight))
+                        * normalizedBookingValue);
         }
 
         private FarmOpportunity mapToFarmOpportunity(BookingDTO booking) {
@@ -107,11 +111,11 @@ public class FarmSelectionService {
                 }
 
                 return new FarmOpportunity(
-                                booking.bookingId,
-                                "Booking #" + booking.bookingId,
-                                acreage,
-                                bookingValue,
-                                cropType);
+                        booking.bookingId,
+                        "Booking #" + booking.bookingId,
+                        acreage,
+                        bookingValue,
+                        cropType);
         }
 
         public static class BookingDTO {
